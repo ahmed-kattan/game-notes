@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>From Rickety Row to Rio: how real places end up on a property board</title>
+<meta name="description" content="How real places reached property-trading boards: home-made copies, local editions, and how a world-cities board was named.">
+<link rel="canonical" href="https://ahmed-kattan.github.io/game-notes/real-places-on-property-boards/">
+<style>body{max-width:44rem;margin:2rem auto;padding:0 1rem;font:17px/1.65 -apple-system,Segoe UI,Roboto,sans-serif;color:#222;background:#fff}a{color:#0b5cad}h1{font-size:1.75rem;line-height:1.25}h2{font-size:1.25rem;margin-top:2rem}table{border-collapse:collapse;margin:1rem 0}td,th{border:1px solid #ccc;padding:.3rem .5rem;text-align:left}header,footer{font-size:.9rem;color:#666}code{background:#f3f3f3;padding:0 .2rem}</style>
+</head>
+<body>
+<header><a href="/game-notes/">Game notes</a> &middot; by Ahmed Moaz</header>
+<main>
+<article>
+<h1>From Rickety Row to Rio: how real places end up on a property board</h1>
+<p><small>4 October 2026</small></p>
+<p>Real places reached property boards mostly through players. The earliest board in the genre used invented names that made a point. Home-made copies swapped in the streets of whatever town people lived in. Publishers then localised the game country by country. The Strong National Museum of Play lists squares on Elizabeth Magie's board, patented in 1904, such as Lonely Lane and Rickety Row.</p>
+<p>If you are putting real places on a board today, the history suggests three things. Group places the way players already group them. Treat the names as data. And never type a count into your copy that the board could change.</p>
+<h2>Invented names that made a point</h2>
+<p>Magie's game was a lesson about land and rent. According to The Strong's online story of the game's origins, players began on Mother Earth and passed squares such as Lonely Lane, Beggerman's Court, Rickety Row and the Slambang Trolley. Nobody had to know a city to play it. The names told you what the designer thought of landlords.</p>
+<h2>Then the players moved in</h2>
+<p>Wikipedia's history of the game traces what happened next, through copies people made by hand. The game was popular around Reading, Pennsylvania, in the 1910s.</p>
+<p>In Indianapolis, Daniel Layman made boards based on that city's streets and sold a version from 1932 as The Fascinating Game of Finance. Ruth Hoskins, a Quaker teacher who learned the game in Indianapolis, made a board with Atlantic City street names after she took the game home. Its names are the ones that reached the game Parker Brothers published in 1935. Magie's own revised patent of 1924 named a couple of squares after Chicago places, such as The Loop and Lake Shore Drive.</p>
+<p>My reading of that pattern: real names spread with home-made copies, because a street you walk down makes a borrowed game feel like your own.</p>
+<h2>Then publishers localised by country</h2>
+<p>When Waddingtons brought the game to Britain in 1936, its edition swapped London places in for the Atlantic City ones. The UK Intellectual Property Office's blog, writing in December 2023, says the street names were the one change needed for success there. Wikipedia also records an Italian edition set in Milan and a short-lived Berlin edition from 1936.</p>
+<h2>A third route: world cities, grouped by country</h2>
+<p>Property Rush, which I build for my site Boardit, is an independent Monopoly alternative with its own board. It has 22 real cities in eight countries: Brazil, Argentina, Italy, France, Japan, Germany, the Netherlands and Canada. Four airports, two utilities and two taxes sit between them.</p>
+<p>What I like about countries as groups is that they need no legend. "I own all of Japan" makes sense to someone who has never seen the board.</p>
+<p>The place a city sits on also decides how often players see it. In 1,000,000 dice rolls through our engine (simulated movement only, 29 September 2026), the busiest cities were Osaka at 3.06% of rolls and Paris at 3.03%, against an even 2.5%. Put the city your players care about on a busy square and they will hear its name more.</p>
+<h2>Where our own words drifted from the board</h2>
+<p>Here is a mistake of ours, and the fix. In code, the board is one list of 40 squares in the order a piece visits them, and each country's name lives in one map. The prose about the board did not read that list.</p>
+<p>On 3 October 2026 our FAQ said the board had two airports. It has four. The fix was to make the page count them: <code>RUSH_BOARD.filter((t) =&gt; t.kind === 'airport').length</code>. Until 4 October, the rules card and the game's cover line still told players to "buy the street", wording inherited from the genre, on a board with no streets. Both now say "buy the city".</p>
+<h2>What this does not show</h2>
+<p>I have no data on whether real names make a board more fun or easier to learn. I only know they are easier to get wrong in writing. The history above comes from secondary sources, not from the boards themselves.</p>
+<h2>The one check to add</h2>
+<p>Write a test that fails when your page and your board disagree. Boardit's guides are checked against the game's own code, with tests that fail if a page and the game disagree. The airport count now comes from the board itself, so that number cannot drift again.</p>
+<p><em>Drafted with AI help and checked by the author.</em></p>
+<p>Boardit is not affiliated with or endorsed by Hasbro.</p>
+</article>
+</main>
+<footer><p>Notes on board and party games by Ahmed Moaz, who builds Boardit, a free browser game site.</p></footer>
+</body>
+</html>

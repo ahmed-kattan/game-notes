@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A sitemap lastmod that tells the truth: hand-kept dates and a fingerprint test</title>
+<meta name="description" content="On 1 September 2026 I found that my site's sitemap lastmod changed every time anyone looked at it.">
+<link rel="canonical" href="https://ahmed-kattan.github.io/game-notes/sitemap-lastmod-that-tells-the-truth/">
+<style>body{max-width:44rem;margin:2rem auto;padding:0 1rem;font:17px/1.65 -apple-system,Segoe UI,Roboto,sans-serif;color:#222;background:#fff}a{color:#0b5cad}h1{font-size:1.75rem;line-height:1.25}h2{font-size:1.25rem;margin-top:2rem}table{border-collapse:collapse;margin:1rem 0}td,th{border:1px solid #ccc;padding:.3rem .5rem;text-align:left}header,footer{font-size:.9rem;color:#666}code{background:#f3f3f3;padding:0 .2rem}</style>
+</head>
+<body>
+<header><a href="/game-notes/">Game notes</a> &middot; by Ahmed Moaz</header>
+<main>
+<article>
+<h1>A sitemap lastmod that tells the truth: hand-kept dates and a fingerprint test</h1>
+<p><small>8 October 2026</small></p>
+<p>On 1 September 2026 I found that my site's sitemap lastmod changed every time anyone looked at it. Two fetches a second apart returned two different dates on all seven URLs. Nothing errored, and every page looked fine in a browser. The feed was simply telling search engines that every page changed constantly, which is a good way to get the field ignored.</p>
+<h2>The assumption behind <code>new Date()</code></h2>
+<p>The sitemap route set <code>lastModified: new Date()</code> on every entry. It is the pattern the Next.js documentation's own <code>sitemap.ts</code> example uses, and it reads as harmless. I had treated it as "when the site was built".</p>
+<p>On my setup that was wrong twice over. The route renders on every request, so <code>new Date()</code> meant "when the crawler happened to ask". That is why the sitemap changes on every request. Even on a build-time sitemap it would mean "when anything was deployed". A commit that touched only internal docs had already restamped the Ludo page, whose content had not changed.</p>
+<h2>What Google does with a sitemap lastmod</h2>
+<p>Does Google use lastmod at all? Its sitemap documentation is plain about it. Google uses <code>&lt;lastmod&gt;</code> only "if it's consistently and verifiably" accurate, for example when it matches the page's own last change. The value should reflect the last significant update, such as the main content, structured data or links. The same page says Google ignores the changefreq and priority fields entirely, so my XML sitemap leaves both out.</p>
+<p>So a lastmod that always says "now" is not neutral. It fails the verifiable test on every URL, and because lastmod accuracy is judged on consistency, the honest dates go down with the dishonest ones.</p>
+<h2>Dates that come from the content</h2>
+<p>The fix was to stop asking the clock. This is the whole trick to lastmod in a Next.js sitemap: read a date, never make one.</p>
+<p>Each game in the catalogue now carries an <code>updated</code> field, a plain <code>YYYY-MM-DD</code> string kept by hand. The sitemap reads it for that game's page. The homepage takes the later of its own date and the freshest game it lists, because it prints every game's name and blurb. ISO dates sort as strings, which is the whole reason for that format.</p>
+<p>Each guide page also prints who wrote it and when it last changed, and that date moves only when the content does. The sitemap and the page now say the same thing.</p>
+<p>When should lastmod change? When the words a searcher can see change, and not otherwise. Hand-kept dates have one obvious failure: someone edits the copy and forgets the date. That is what the test is for.</p>
+<h2>A fingerprint that fails when the copy moves</h2>
+<p>The test takes a content hash of everything a search result can see for a game page, and compares it with a stored fingerprint:</p>
+<pre><code>/** The fields that actually reach a search result for /play/&lt;slug&gt;. */
+function indexedContent(game: Game): string {
+  return JSON.stringify([
+    game.slug, game.name, game.blurb, game.players, game.time,
+    game.minSeats, game.maxSeats, game.ready,
+    rulesFor(game.slug).map((rule) =&gt; [rule.name, rule.desc]),
+    guideFor(game.slug) ?? null,
+  ]);
+}
+
+function fingerprint(game: Game): string {
+  return createHash(&#x27;sha256&#x27;).update(indexedContent(game)).digest(&#x27;hex&#x27;).slice(0, 12);
+}
+
+it(&#x27;does not change between two calls&#x27;, () =&gt; {
+  const first = sitemap().map((e) =&gt; String(e.lastModified));
+  const second = sitemap().map((e) =&gt; String(e.lastModified));
+  expect(second).toEqual(first);
+});</code></pre>
+<p>Edit a game's rules or guide and the hash changes. The failure message gives the new fingerprint and says what to do: set that game's date to today, then paste the fingerprint in. Forgetting becomes a red test instead of a stale sitemap.</p>
+<p>What is left out matters as much. Purely visual fields are excluded, because a change of look changes nothing a crawler reads. The written guide was left out at first too. It went in on 27 September 2026, after four guides changed and no date moved with them.</p>
+<p>The second test is the regression test for the original bug, and it demands a deterministic sitemap. Any <code>new Date()</code> in the sitemap makes two calls disagree by a millisecond, and it fails.</p>
+<h2>The test that passed while checking nothing</h2>
+<p>One check compares the homepage date with the freshest game. It once looked the homepage up by its old path. When the path changed, the lookup returned <code>undefined</code>, and <code>String(undefined) &gt;= "2026-09-01"</code> is true, because "u" sorts after "2". The test went on passing with nothing behind it. It now asserts that the entry exists before comparing anything.</p>
+<h2>What it costs</h2>
+<p>The test fires often. Between 2 September and 4 October 2026, 23 commits changed at least one fingerprint, one of them a merge. Nearly all were copy changes that would otherwise have left a date behind; the exception was the day the guide joined the hash.</p>
+<p>It also cannot judge significance. Fixing one typo in a guide moves that page's date, although Google would not call it a significant update. I accept that. A date that is sometimes early is better than one that is always "now".</p>
+<h2>A check you can copy</h2>
+<p>Fetch your own sitemap twice, a few seconds apart, and compare the bytes. I did that for mine on 8 October 2026: the two copies were identical across 37 URLs, with lastmod values spread over several dates, not one. If yours differ between fetches, something in the route is reading the clock.</p>
+<h2>Where this stops</h2>
+<p>This is one small site, and I have no data on whether Google now trusts its dates. The fingerprint covers the game pages only. The other pages keep their dates in a separate file; a test keeps each one in step with the date the page prints, but no hash watches their copy. And hand-kept dates rely on a person reading the failure message. The sitemap and the pages it dates belong to <a href="https://playboardit.com/">Boardit</a>, the browser game site I build, if you want to compare them yourself.</p>
+<p><em>Ahmed Moaz builds Boardit, a free browser game site. Drafted with AI help and checked by the author.</em></p>
+</article>
+</main>
+
+<footer><p>Notes on board and party games by Ahmed Moaz, who builds Boardit, a free browser game site.</p></footer>
+</body>
+</html>

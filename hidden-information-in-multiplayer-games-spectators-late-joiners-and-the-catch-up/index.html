@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hidden information in multiplayer games: spectators, late joiners and the catch-up problem</title>
+<meta name="description" content="Most writing on hidden information in multiplayer games is about the players already at the table. The guesser must not receive the secret word, and an opp">
+<link rel="canonical" href="https://ahmed-kattan.github.io/game-notes/hidden-information-in-multiplayer-games-spectators-late-joiners-and-the-catch-up/">
+<style>body{max-width:44rem;margin:2rem auto;padding:0 1rem;font:17px/1.65 -apple-system,Segoe UI,Roboto,sans-serif;color:#222;background:#fff}a{color:#0b5cad}h1{font-size:1.75rem;line-height:1.25}h2{font-size:1.25rem;margin-top:2rem}table{border-collapse:collapse;margin:1rem 0}td,th{border:1px solid #ccc;padding:.3rem .5rem;text-align:left}header,footer{font-size:.9rem;color:#666}code{background:#f3f3f3;padding:0 .2rem}</style>
+</head>
+<body>
+<header><a href="/game-notes/">Game notes</a> &middot; by Ahmed Moaz &middot; <a href="/game-notes/about/">About</a></header>
+<main>
+<article>
+<h1>Hidden information in multiplayer games: spectators, late joiners and the catch-up problem</h1>
+<p><small>Ahmed Moaz &middot; 10 October 2026</small></p>
+<p>Most writing on hidden information in multiplayer games is about the players already at the table. The guesser must not receive the secret word, and an opponent must not receive your cards. That part is well understood. The harder cases arrive later: a spectator who opens the table halfway through a round, a newcomer who joins a game already under way, and a player who drops and comes back. Each of them has to be caught up by the multiplayer game server, and catching up is where secrets leak.</p>
+<p>I build Boardit, a free browser game site for playing with friends, which added spectators and mid-game joins on the same day in October 2026. This post is a checklist for those three arrivals, written without code.</p>
+<h2>The rule, borrowed from a shooter</h2>
+<p>The clearest statement of the idea comes from a very different genre. In April 2020, Paul Chamberlain, the anti-cheat lead on Riot Games' <em>VALORANT</em>, described its Fog of War system on the Riot technology blog. He explained that the older system in <em>League of Legends</em> works because its server "withholds information about the positions of enemies until a client needs to display it".</p>
+<p>He broke the job into three parts. Decide what information each player needs. Stop players receiving anything else. Catch a player up when hidden information becomes necessary. A wallhack has nothing to show if the positions never arrive.</p>
+<p>The usual slogan is "never trust the client"; the stronger rule is never to tell the client what it should not know. Most advice on how to prevent cheating in online games covers the first two parts. This post is about the third, because every late arrival is a catch-up.</p>
+<h2>Hidden information in multiplayer games needs a spectator view of its own</h2>
+<p>Boardit added watchers on 2 October 2026: a host can open a table to as many as 20 people who hold no seat. The public changelog promises that watchers never see hidden words, answers or cards.</p>
+<p>The tempting way to build a spectator mode is to take a player's view and switch off the inputs. That inherits everything the player was sent. A watcher needs their own, smaller view of the game state, built from a list of what is safe rather than a list of what to remove.</p>
+<p>The difference shows up next month. When someone adds a new hidden field, a remove-list leaks it until somebody remembers to update the list. A safe-list keeps it hidden until somebody decides a watcher may see it.</p>
+<p>For a drawing round, a watcher's view should leave out:</p>
+<ul><li>the word, until the turn's reveal;</li><li>if the drawer chooses from a shortlist, the words not chosen;</li><li>hint letters the table has not yet been shown;</li><li>the text of any correct guess.</li></ul>
+<p>There is a second reason to keep watchers on the guessers' side of the line. A watcher is often on the same call as the players. Anything a watcher can read, a guesser can be told.</p>
+<h2>Late joiners: deal them in at a boundary</h2>
+<p>Games call this join in progress. On the same day as watchers, Boardit's online drawing game, Draw and Guess, began letting newcomers join a public game that is already running. A newcomer is dealt in at the next turn, not halfway through the current one. Its spy game, played on separate phones, deals a newcomer in at the start of the next round, and a spy game on one shared phone cannot be joined at all once it has started.</p>
+<p>Whatever the reasons for those choices, they are also the safe ones for secrecy. A turn or round boundary is a moment when there is no live secret to hand over. The newcomer receives exactly what every seated player receives at the start of a turn, so the catch-up path is the normal path. Joining mid-turn would need a special path that decides, under time pressure, which half of the hidden state this person may have.</p>
+<h2>Reconnects: the same view as before, and nothing more</h2>
+<p>Reconnection is Chamberlain's third part in its plainest form. A drawer who drops and comes back needs the word again. A guesser who drops and comes back must get the same view as before, and nothing more.</p>
+<p>The risk is in the code path, not the rule. A reconnect often sends a fresh copy of the whole game state, because the browser has lost everything. If that copy is built differently from the live updates, it can carry a field the live updates never did. Build both from the same function: one that takes the state and a role, and returns only what that role may see.</p>
+<h2>How to test each arrival</h2>
+<p>Play as a guesser, open the browser's developer tools and watch the network tab. Search every message for the word, for any offered choice, and for the hint letters not yet shown. Then do the same as a watcher, as a newcomer who joins mid-game, and after a reconnect.</p>
+<p>That catches today's leak but not next month's. The durable check is an automated test: build the view a guesser, watcher or newcomer would receive, and assert that the word's string appears nowhere in it. Run it on every change, because new features are where leaks come from.</p>
+<h2>What hiding costs</h2>
+<p>Every audience needs its own view, and each view is code to keep in step with the game. A late arrival waits for the next turn instead of joining at once. Watchers also lose something a television audience enjoys: knowing the answer before the contestants do.</p>
+<p>This is a checklist of principles, not a security audit of any game, Boardit's included, and I do not describe how Boardit stores its word or builds its views. A checklist cannot prove that nothing leaks. Only testing what each arrival actually receives can do that.</p>
+<p><em>Ahmed Moaz builds Boardit, a free browser game site. Drafted and reviewed with AI help; facts checked against the game's code.</em></p>
+</article>
+</main>
+<footer><p>Notes on board and party games by Ahmed Moaz, who builds Boardit, a free browser game site.</p></footer>
+</body>
+</html>

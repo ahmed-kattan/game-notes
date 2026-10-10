@@ -1,0 +1,13 @@
+{
+ "title": "Game notes",
+ "short": "Game notes",
+ "description": "Notes on board and party games: rule history, the numbers inside the games, and building them for the browser.",
+ "canonical_base": "https://ahmed-kattan.github.io/game-notes/",
+ "base": "/game-notes/",
+ "blurb": "Notes on board and party games: the history behind the rules, the numbers inside them, and what I learned building a few of them for the browser.",
+ "footer": "Notes on board and party games by Ahmed Moaz, who builds Boardit, a free browser game site.",
+ "about": [
+  "I am Ahmed Moaz, a developer in Egypt. I build Boardit, a small site of six free multiplayer browser games.",
+  "These notes are mostly about the engineering behind browser games: keeping a hidden word hidden, testing a game engine with thousands of seeded games, and the small decisions that make a page honest to search engines. Some notes are about the history and numbers inside the games themselves."
+ ]
+}

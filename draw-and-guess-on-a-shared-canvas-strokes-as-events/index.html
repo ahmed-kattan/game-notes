@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Draw-and-guess on a shared canvas: strokes as events</title>
+<meta name="description" content="A shared canvas stays in step across phones and laptops if you send events and not pixels. Each stroke becomes a small record: an id, a colour, a width and">
+<link rel="canonical" href="https://ahmed-kattan.github.io/game-notes/draw-and-guess-on-a-shared-canvas-strokes-as-events/">
+<style>body{max-width:44rem;margin:2rem auto;padding:0 1rem;font:17px/1.65 -apple-system,Segoe UI,Roboto,sans-serif;color:#222;background:#fff}a{color:#0b5cad}h1{font-size:1.75rem;line-height:1.25}h2{font-size:1.25rem;margin-top:2rem}table{border-collapse:collapse;margin:1rem 0}td,th{border:1px solid #ccc;padding:.3rem .5rem;text-align:left}header,footer{font-size:.9rem;color:#666}code{background:#f3f3f3;padding:0 .2rem}</style>
+</head>
+<body>
+<header><a href="/game-notes/">Game notes</a> &middot; by Ahmed Moaz &middot; <a href="/game-notes/about/">About</a></header>
+<main>
+<article>
+<h1>Draw-and-guess on a shared canvas: strokes as events</h1>
+<p><small>Ahmed Moaz &middot; 12 October 2026</small></p>
+<p>A shared canvas stays in step across phones and laptops if you send events and not pixels. Each stroke becomes a small record: an id, a colour, a width and a flat list of points. Later points arrive as extensions. Undo and clear are events too, and the picture is whatever you get by folding the log. That is how the draw and guess game I build works, and the whole protocol fits in one table.</p>
+<p>I read the code on 10 October 2026 to write this, so every number below comes from a constant in the source.</p>
+<h2>Six operations are the whole protocol</h2>
+<p>The drawing is a list of operations, and a list is easy to validate, replay and save. Each one has a one-letter type.</p>
+<table><thead><tr><th>Type</th><th>Meaning</th><th>Carries</th></tr></thead><tbody><tr><td>s</td><td>start a freehand stroke</td><td>id, colour, width, first points</td></tr><tr><td>e</td><td>extend a stroke already started</td><td>id, more points</td></tr><tr><td>h</td><td>a shape: line, circle, square, rectangle, triangle</td><td>kind, colour, width, two corners</td></tr><tr><td>f</td><td>bucket fill</td><td>colour, one point</td></tr><tr><td>u</td><td>undo</td><td>nothing</td></tr><tr><td>x</td><td>clear the page</td><td>nothing</td></tr></tbody></table>
+<p>Points are flat: x0, y0, x1, y1 and so on. A stroke begins as a start event, for example <code>{"t":"s","id":"7.ab.1","c":"#2f6fd0","w":8,"p":[120,300]}</code>. The id is built from the turn number, a tag for the browser and a counter. After that, a few dozen milliseconds of movement travel as <code>{"t":"e","id":"7.ab.1","p":[124,298,131,295]}</code>. (Both lines are written by hand to show the shape, not captured from a table.)</p>
+<p>The picture is never stored as a bitmap. To get it back, fold the log. Extends join their strokes, an undo removes the latest mark, and a clear empties the page. One short function does it, and the live viewers and the saved copy both use it.</p>
+<h2>One page, not one screen</h2>
+<p>The first prototype stored coordinates as fractions of each device's own box. That stretched a drawing between a tall phone and a wide monitor, so a circle on one screen was an egg on another. The shipped game uses one fixed page of 800 by 600 logical pixels and letterboxes it on every screen.</p>
+<p>The page is painted on an off-screen bitmap at 1.5 times that size, which is 1,200 by 900 pixels, or 1,080,000. Bucket fill runs on that bitmap, not on a screen's canvas. So the same click fills the same region on every device, and rotating a tablet only rescales a finished picture.</p>
+<h2>From pointer to wire</h2>
+<p>A browser fires pointer events far more often than a line needs. Two things keep that in check.</p>
+<ul><li>Thinning. Points closer than 1.5 page pixels to the last one kept are dropped, though the final point is always kept so a stroke ends where the pen lifted.</li><li>Batching. Pending operations go out together every 40 milliseconds, and each batch carries a turn number and a sequence number.</li></ul>
+<p>Here is the arithmetic for a two-second stroke, using an assumed 120 samples a second. That is 240 points, or 480 numbers. Sent one per message, it would be 240 messages. At 40 milliseconds per flush it is at most 50 batches, so about five points each. The drawer's screen paints locally, so the drawing never waits on the network.</p>
+<p>This traffic does not touch the database. Strokes travel over a private Realtime broadcast channel named for the room, and only the player who is drawing may send on it. The check is made when a browser joins, so every browser rejoins at the start of each turn. Otherwise last turn's drawer would keep permission to scribble, and the new one could not send.</p>
+<p>You can watch these batches arrive in a live table of <a href="https://playboardit.com/play/draw-and-guess">Boardit's Draw and Guess</a>.</p>
+<h2>When a batch goes missing</h2>
+<p>Broadcast is fast and does not promise delivery. A viewer therefore accepts a batch only if its number is exactly one more than the last it applied. A higher number means a gap, so the viewer pauses, buffers whatever arrives next and loads the saved picture instead.</p>
+<p>That covers a gap noticed later. It does not cover the last batch of a stroke, because nothing follows it to reveal the gap. So the drawer saves the folded picture 1.5 seconds after going quiet, and each viewer asks for the number of that save at 3 seconds and 7 seconds after the last batch it heard. After that it asks every 10 seconds, and again when the browser comes back online or the tab becomes visible. It reads the whole picture only when the save is ahead of what it has.</p>
+<p>The same care applies at the drawer's end. A stroke drawn inside a single 40 millisecond window, such as a quick flick, once reached the other players as its opening dot alone. The pointer-up handler cleared the stroke before the final flush read it. The drawer's screen and the saved copy were always whole, which hid the bug. The fix is to flush first and release second.</p>
+<h2>Never trust the browser</h2>
+<p>Operations cross the network twice, once live and once on save, so each is re-validated wherever it arrives.</p>
+<ul><li>Coordinates are rounded and clamped to the page.</li><li>A colour must be a six-digit hex value or an HSL string from the chart, and nothing else is painted.</li><li>An operation may carry at most 4,000 points, and an id at most 24 characters.</li><li>On save, the server folds the log into marks, so undone strokes never reach the database, and refuses anything over 600,000 bytes.</li><li>Only the current drawer, on the current turn, may save.</li></ul>
+<p>Neither the live batches nor the saved picture ever contains the secret word. The game checks a typed guess against the word on the server, and only then tells the table.</p>
+<h2>Late joiners and watchers</h2>
+<p>A browser that joins the channel mid-turn loads the saved picture first. It holds any batches that arrive during the load, then applies them in order, skipping numbers it already has. That is the same path as recovering from a gap, so there is one recovery routine to test, not two.</p>
+<p>A person watching a table, without a seat, never joins the stroke channel at all. The watcher's feed carries the saved picture instead, and the canvas redraws whenever a newer save of the same turn arrives. A watcher therefore probably sees the drawing a little behind the players, in return for no live load on the channel.</p>
+<h2>If you build your own</h2>
+<p>The order I would follow is:</p>
+<ol><li>Pick one fixed page and scale it to every screen.</li><li>Define a short list of operations, with a fold that rebuilds the picture.</li><li>Number your batches, and make a gap fall back to a snapshot.</li><li>Save a folded picture shortly after the pen goes quiet.</li><li>Let the server decide what is a valid operation, and who may send it.</li></ol>
+<p>A drawing game online is mostly an event log with good manners. Once those five steps are in place, a group playing with friends can fill the canvas together without anyone's screen going out of step.</p>
+<p><em>By Ahmed Moaz, who builds Boardit. Drafted and reviewed with AI help; the game's own code was the source for the facts.</em></p>
+</article>
+</main>
+<footer><p>Notes on board and party games by Ahmed Moaz, who builds Boardit, a free browser game site.</p></footer>
+</body>
+</html>

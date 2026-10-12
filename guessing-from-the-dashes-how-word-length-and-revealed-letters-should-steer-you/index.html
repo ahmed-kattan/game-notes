@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guessing from the dashes: how word length and revealed letters should steer you</title>
+<meta name="description" content="Before the first hint, the row of dashes already rules out most of the dictionary, and each revealed letter rules out about nine tenths of what is left. Fo">
+<link rel="canonical" href="https://ahmed-kattan.github.io/game-notes/guessing-from-the-dashes-how-word-length-and-revealed-letters-should-steer-you/">
+<style>body{max-width:44rem;margin:2rem auto;padding:0 1rem;font:17px/1.65 -apple-system,Segoe UI,Roboto,sans-serif;color:#222;background:#fff}a{color:#0b5cad}h1{font-size:1.75rem;line-height:1.25}h2{font-size:1.25rem;margin-top:2rem}table{border-collapse:collapse;margin:1rem 0}td,th{border:1px solid #ccc;padding:.3rem .5rem;text-align:left}header,footer{font-size:.9rem;color:#666}code{background:#f3f3f3;padding:0 .2rem}</style>
+</head>
+<body>
+<header><a href="/game-notes/">Game notes</a> &middot; by Ahmed Moaz &middot; <a href="/game-notes/about/">About</a></header>
+<main>
+<article>
+<h1>Guessing from the dashes: how word length and revealed letters should steer you</h1>
+<p><small>Ahmed Moaz &middot; 13 October 2026</small></p>
+<p>Before the first hint, the row of dashes already rules out most of the dictionary, and each revealed letter rules out about nine tenths of what is left. For a five-letter word, my count in a large English word list went from 8,506 candidates, to about 617 after one letter, to about 57 after two. That is the whole case for reading the dashes before you look at the picture, and this article shows the count, the hint timing in Draw and Guess, and a habit that follows from both.</p>
+<h2>What the dashes already tell you</h2>
+<p>In a drawing game online, the guesser sees one slot per letter. Spaces, hyphens and apostrophes are shown from the start, and the length of each word is shown with them. So a pattern of 3 and 5 is two words, a short one and a longer one, before anyone has drawn a line.</p>
+<p>That gives you a first decision, and it is free. Decide the shape: one word or two. A pattern of 3 and 5 rules out every single eight-letter answer at once. The picture then only has to separate one short pair of words from another.</p>
+<h2>How much one letter narrows the field</h2>
+<p>I ran the count on the word list that ships with macOS, which is Webster's Second International from 1934. I kept the 210,773 entries that are lowercase letters only. For each word length I asked a simple question: if one letter, or two, of a random word of that length were revealed at random positions, how many words in the list would still fit the pattern?</p>
+<table><thead><tr><th>Word length</th><th>Words of that length</th><th>After 1 letter (average)</th><th>After 2 letters (average)</th></tr></thead><tbody><tr><td>4</td><td>4,360</td><td>327</td><td>29</td></tr><tr><td>5</td><td>8,506</td><td>617</td><td>57</td></tr><tr><td>6</td><td>15,073</td><td>1,168</td><td>120</td></tr><tr><td>8</td><td>26,446</td><td>2,016</td><td>205</td></tr></tbody></table>
+<p>The first letter divides the field by 13 or 14 at four and five letters. The second divides it by about 11 again. The totals are far too big for the game, because a 1934 dictionary is full of words nobody would draw. The game's words are everyday ones. Treat the table as a statement about ratios, not about how many words you are choosing from.</p>
+<h2>When the hints arrive, and what waiting costs</h2>
+<p>Hints fill in letters while the time drains, in a shuffled order rather than left to right, and a host can allow up to three. Their timing follows the clock. With the default 80-second drawing and two hints, the first arrives 27 seconds in and the second 53 seconds in. The setting is a ceiling, not a promise: a hint never reveals more than half the letters, so a three-letter word can give up at most one.</p>
+<p>Now set that beside the scoring. A first correct guess starts at 500 points and loses 5 a second on the default clock, with a floor of 100. At 27 seconds in, 53 seconds are left, so that guess pays 365. At 53 seconds in, it pays 235. Waiting for the second hint therefore costs 130 points, and the second player to get it keeps only about 56 percent of whatever the clock gives.</p>
+<p>You can watch that schedule run on a free table at <a href="https://playboardit.com/play/draw-and-guess">Boardit</a>.</p>
+<h2>Should you wait for a hint before you guess?</h2>
+<p>No, if you have a candidate. A wrong guess costs no points, and time is the only thing that spends them: a guess at 10 seconds is worth 450, at 27 seconds 365 and at 53 seconds 235. The honest cost of a wrong guess is that the table can read it. Everyone else sees it and can cross that word off.</p>
+<h2>A three-step habit</h2>
+<ol><li>Read the shape. One word or two, and how many letters in each.</li><li>List the words that fit before the picture shapes your mind. Two or three is enough.</li><li>Type the likeliest, and keep typing as the picture develops.</li></ol>
+<p>One more rule from the code helps with step 3. A near miss of one letter is reported privately to the typist, but only on words with four or more letters. On a three-letter word you get no near-miss notice at all, because on a short word one letter off is simply a different common word, and saying "close" would almost give the answer away. So on short words, rely on the letter count and the hints; on longer ones, a close notice means the dashes and the revealed letters can usually settle the last letter.</p>
+<p>Next time you play with friends, try step 2 out loud: say the shape before anyone has drawn. How many candidates do you list when the pattern is 4 and 6?</p>
+<p><em>Written for Boardit's maker, Ahmed Moaz, with AI help. The game facts were checked against the game's code.</em></p>
+</article>
+</main>
+<footer><p>Notes on board and party games by Ahmed Moaz, who builds Boardit, a free browser game site.</p></footer>
+</body>
+</html>

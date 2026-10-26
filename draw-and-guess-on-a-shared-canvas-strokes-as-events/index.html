@@ -6,14 +6,16 @@
 <title>Draw-and-guess on a shared canvas: strokes as events</title>
 <meta name="description" content="A shared canvas stays in step across phones and laptops if you send events and not pixels. Each stroke becomes a small record: an id, a colour, a width and">
 <link rel="canonical" href="https://ahmed-kattan.github.io/game-notes/draw-and-guess-on-a-shared-canvas-strokes-as-events/">
-<style>body{max-width:44rem;margin:2rem auto;padding:0 1rem;font:17px/1.65 -apple-system,Segoe UI,Roboto,sans-serif;color:#222;background:#fff}a{color:#0b5cad}h1{font-size:1.75rem;line-height:1.25}h2{font-size:1.25rem;margin-top:2rem}table{border-collapse:collapse;margin:1rem 0}td,th{border:1px solid #ccc;padding:.3rem .5rem;text-align:left}header,footer{font-size:.9rem;color:#666}code{background:#f3f3f3;padding:0 .2rem}</style>
+<link rel="alternate" type="application/rss+xml" title="Game notes" href="https://ahmed-kattan.github.io/game-notes/feed.xml">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Draw-and-guess on a shared canvas: strokes as events", "datePublished": "2026-10-12", "author": {"@type": "Person", "name": "Ahmed Moaz"}, "mainEntityOfPage": "https://ahmed-kattan.github.io/game-notes/draw-and-guess-on-a-shared-canvas-strokes-as-events/", "isPartOf": {"@type": "Blog", "name": "Game notes", "url": "https://ahmed-kattan.github.io/game-notes/"}}</script>
+<style>table{border-collapse:collapse;margin:1rem 0}td,th{border:1px solid currentColor;padding:.3rem .5rem;text-align:left;opacity:.95}h1{line-height:1.25}h2{margin-top:2rem}img{max-width:100%}.more ul{padding-left:1.1rem}body{max-width:44rem;margin:2rem auto;padding:0 1rem;font:17px/1.65 -apple-system,Segoe UI,Roboto,sans-serif;color:#222;background:#fff}a{color:#0b5cad}h1{font-size:1.75rem}h2{font-size:1.25rem}header,footer,.meta{font-size:.9rem;color:#666}</style>
 </head>
 <body>
 <header><a href="/game-notes/">Game notes</a> &middot; by Ahmed Moaz &middot; <a href="/game-notes/about/">About</a></header>
 <main>
 <article>
 <h1>Draw-and-guess on a shared canvas: strokes as events</h1>
-<p><small>Ahmed Moaz &middot; 12 October 2026</small></p>
+<p class="meta">Ahmed Moaz &middot; <time datetime="2026-10-12">12 October 2026</time></p>
 <p>A shared canvas stays in step across phones and laptops if you send events and not pixels. Each stroke becomes a small record: an id, a colour, a width and a flat list of points. Later points arrive as extensions. Undo and clear are events too, and the picture is whatever you get by folding the log. That is how the draw and guess game I build works, and the whole protocol fits in one table.</p>
 <p>I read the code on 10 October 2026 to write this, so every number below comes from a constant in the source.</p>
 <h2>Six operations are the whole protocol</h2>
@@ -45,8 +47,9 @@
 <p>The order I would follow is:</p>
 <ol><li>Pick one fixed page and scale it to every screen.</li><li>Define a short list of operations, with a fold that rebuilds the picture.</li><li>Number your batches, and make a gap fall back to a snapshot.</li><li>Save a folded picture shortly after the pen goes quiet.</li><li>Let the server decide what is a valid operation, and who may send it.</li></ol>
 <p>A drawing game online is mostly an event log with good manners. Once those five steps are in place, a group playing with friends can fill the canvas together without anyone's screen going out of step.</p>
-<p><em>By Ahmed Moaz, who builds Boardit. Drafted and reviewed with AI help; the game's own code was the source for the facts.</em></p>
+<p><em>By Ahmed Moaz, who builds Boardit.</em></p>
 </article>
+<aside class="more"><h2>More on Game notes</h2><ul><li><a href="/game-notes/a-teen-birthday-drawing-game-with-the-guests-names-as-words/">A teen birthday drawing game with the guests&#x27; names as words</a></li><li><a href="/game-notes/guessing-from-the-dashes-how-word-length-and-revealed-letters-should-steer-you/">Guessing from the dashes: how word length and revealed letters should steer you</a></li><li><a href="/game-notes/pacing-an-80-second-sketch/">Pacing an 80-second sketch</a></li></ul></aside>
 </main>
 <footer><p>Notes on board and party games by Ahmed Moaz, who builds Boardit, a free browser game site.</p></footer>
 </body>

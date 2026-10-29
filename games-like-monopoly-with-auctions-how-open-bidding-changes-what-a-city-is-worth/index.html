@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Games like Monopoly with auctions: how open bidding changes what a city is worth</title>
+<meta name="description" content="In many property games, a city that a player declines simply goes back in the box. In others, it goes to auction. People who search for games like Monopoly">
+<link rel="canonical" href="https://ahmed-kattan.github.io/game-notes/games-like-monopoly-with-auctions-how-open-bidding-changes-what-a-city-is-worth/">
+<link rel="alternate" type="application/rss+xml" title="Game notes" href="https://ahmed-kattan.github.io/game-notes/feed.xml">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Games like Monopoly with auctions: how open bidding changes what a city is worth", "datePublished": "2026-10-29", "author": {"@type": "Person", "name": "Ahmed Moaz"}, "mainEntityOfPage": "https://ahmed-kattan.github.io/game-notes/games-like-monopoly-with-auctions-how-open-bidding-changes-what-a-city-is-worth/", "isPartOf": {"@type": "Blog", "name": "Game notes", "url": "https://ahmed-kattan.github.io/game-notes/"}}</script>
+<style>table{border-collapse:collapse;margin:1rem 0}td,th{border:1px solid currentColor;padding:.3rem .5rem;text-align:left;opacity:.95}h1{line-height:1.25}h2{margin-top:2rem}img{max-width:100%}.more ul{padding-left:1.1rem}body{max-width:44rem;margin:2rem auto;padding:0 1rem;font:17px/1.65 -apple-system,Segoe UI,Roboto,sans-serif;color:#222;background:#fff}a{color:#0b5cad}h1{font-size:1.75rem}h2{font-size:1.25rem}header,footer,.meta{font-size:.9rem;color:#666}</style>
+</head>
+<body>
+<header><a href="/game-notes/">Game notes</a> &middot; by Ahmed Moaz &middot; <a href="/game-notes/about/">About</a></header>
+<main>
+<article>
+<h1>Games like Monopoly with auctions: how open bidding changes what a city is worth</h1>
+<p class="meta">Ahmed Moaz &middot; <time datetime="2026-10-29">29 October 2026</time></p>
+<p>In many property games, a city that a player declines simply goes back in the box. In others, it goes to auction. People who search for games like Monopoly with auctions are usually asking for the second kind, because it keeps every turn interesting, including the ones that are not yours. The property trading game I build keeps auctions on from the start, and the mechanism changes how you should price a city.</p>
+<h2>How does the auction work?</h2>
+<p>Your token stops on a city that has no owner. You may buy it for the printed price. If you pass, everybody gets to name a price for it.</p>
+<p>There is no order and no list of who is still in. Anyone who has not left the game can raise at any moment. Each bid pushes the hammer back, so a contested city runs on until the raises stop. If nobody bids, the bank keeps the city. The host can turn the whole thing off during setup.</p>
+<p>The consequence is that a decline is never a veto. Your rival can buy what you passed on, at a price the table sets, not you.</p>
+<h2>How much is a city worth, then?</h2>
+<p>That is the real question, and a printed price answers only part of it. Start with the dull number. Moving one token around the board three million times, I found it takes 368 rival turns for Osaka's bare-land rent to repay its price of 240. For Toronto, price 400, the count is 293. Those are rival turns, so a table of six gets there faster than a duel.</p>
+<p>So a single city on bare land is a slow investment. If you bid far above its price for the rent alone, you are paying for patience you may not have.</p>
+<p>What rescues a bid is the set. A full country doubles base rent, and that halves those counts. Add houses and the payback shrinks again. A city that finishes your set is worth more to you than its price, and a city that does nothing for you is worth less.</p>
+<p>Here is a case. Italy has three cities: Venice at 130, Milan at 140 and Rome at 160. Suppose you hold the first two and Rome comes up for auction. Two cities alone cannot be built on, and their rent is small. With Rome as well you own the country. Base rent doubles at once, and houses become possible, so three of them on Rome would charge 500. Compared with 12 for bare Rome, the difference is huge. For you that city is worth well over 160. For a rival who holds nothing in Italy, it is worth about the printed price.</p>
+<h2>What do my bots think?</h2>
+<p>I tuned a bot by playing games forward from real positions and seeing who won. In those play-outs, a city that completed the bot's own country was worth about 2.5 times its printed price. A lone city, in my trade-fairness measure, counts at 60% of its price, because it earns a little and may be traded later.</p>
+<p>Do not treat these as laws. They come from a model, and the model was built on computer play. But they point the right way. The gap between a set-completing bid and a lone one is large, and a human table often underrates it.</p>
+<h2>How do bots bid?</h2>
+<p>They raise by about a tenth of the price. An early version crept up in $5 steps, which made auctions between bots crawl, so I changed it. Near the bot's limit it drops to $5 raises.</p>
+<h2>What habits help when you bid?</h2>
+<p>I will not claim a perfect method, but I can give you three habits.</p>
+<ul><li>Know your ceiling before you bid, and write it down in your head. Cash spent here cannot build later.</li><li>Bid high only for a city that completes a country, yours or a rival's. Stopping a rival's set is a reason too.</li><li>Notice who is short of cash. A player with little money cannot follow you up.</li></ul>
+<h2>Is this idea new?</h2>
+<p>No. Among the variants of The Landlord's Game, which Elizabeth Magie patented in 1904, were versions called Monopoly, Finance and Auction. Bidding has been part of this family for a long time.</p>
+<h2>How do you try an auction table?</h2>
+<p>You can play a table with auctions on at <a href="https://playboardit.com/play/highroad">Boardit</a>. Friends join from their own devices, and the host settles the auction switch before the first roll. Up to six can sit down, and bots can take any chairs left over.</p>
+<p>Property Rush is an independent Monopoly alternative, so you can play online with friends and keep the bidding. Auctions start switched on.</p>
+<p>Boardit is not affiliated with or endorsed by Hasbro.</p>
+<p><em>Ahmed Moaz builds Boardit, a free browser game site.</em></p>
+</article>
+<aside class="more"><h2>More on Game notes</h2><ul><li><a href="/game-notes/an-empty-seat-at-the-table-how-bots-fill-it-in-a-monopoly-alternative/">An empty seat at the table: how bots fill it in a Monopoly alternative</a></li><li><a href="/game-notes/geography-trivia-questions-on-rivers-lakes-and-mountains-with-a-story-for-each-a/">Geography trivia questions on rivers, lakes and mountains, with a story for each answer</a></li><li><a href="/game-notes/games-to-play-on-video-call-with-a-big-family-household-teams-and-one-clear-host/">Games to play on video call with a big family: household teams and one clear host</a></li></ul></aside>
+</main>
+<footer><p>Notes on board and party games by Ahmed Moaz, who builds Boardit, a free browser game site.</p></footer>
+</body>
+</html>
